@@ -1,7 +1,14 @@
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
+
 export default function Home() {
 	return (
 		<div>
-			<h1>This is homepage</h1>
+			<Navbar />
+
+			<div>
+				<Sidebar />
+			</div>
 		</div>
 	);
 }
