@@ -8,7 +8,7 @@ export default function Navbar() {
 				<div className="flex flex-row items-center justify-between">
 					<a
 						href="#"
-						className="text-lg font-semibold text-gray-900 rounded-lg dark-mode:text-white focus:outline-none focus:shadow-outline"
+						className="text-lg font-medium text-gray-900 rounded-lg dark-mode:text-white focus:outline-none focus:shadow-outline"
 					>
 						Mockingbird
 					</a>

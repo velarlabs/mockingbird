@@ -1,4 +1,4 @@
-import "./styles/index.css";
+import "./styles/index.scss";
 import "./styles/tailwind.dist.css";
 
 console.log(
