@@ -1,20 +1,8 @@
-import { Label } from "../../../components/ui/label";
-import { Input } from "../../../components/ui/input";
-import { Textarea } from "../../../components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../../../components/ui/form";
 import { Endpoint } from "..";
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "../../../components/ui/button";
 import { Play, Save } from "lucide-react";
 import {
   Select,
@@ -22,7 +10,19 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   method: z.enum(["GET", "POST", "PUT", "DELETE"], {
@@ -79,10 +79,7 @@ export default function EndpointDetails({
           className="flex flex-col flex-1 w-full h-full space-y-4"
         >
           <div className="flex self-end justify-end gap-x-4">
-            <Button
-              type="button"
-              onClick={() => console.log("Run")}
-            >
+            <Button type="button" onClick={() => console.log("Run")}>
               <Play className="w-4 h-4 mr-2" />
               Run
             </Button>

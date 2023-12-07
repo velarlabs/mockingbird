@@ -1,5 +1,5 @@
-import SizedBox from "../../components/SizedBox";
-import Navbar from "../../components/Navbar";
+import SizedBox from "@/components/SizedBox";
+import Navbar from "@/components/Navbar";
 import EndpointDetails from "./views/EndpointDetails";
 import EndpointLists from "./views/EndpointLists";
 import { useState } from "react";
