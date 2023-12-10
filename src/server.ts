@@ -24,7 +24,7 @@ export const addRoute = ({
 	}
 
 	// Since can't delete a route, we need to filter it out
-	router.stack = router.stack.filter(i => i.route.path !== endpoint || i.route.path !== prevEndpoint);
+	router.stack = router.stack.filter(i => i.route.path !== endpoint && i.route.path !== prevEndpoint);
 
 	// Different methods
 	switch (method) {
