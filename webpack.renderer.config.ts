@@ -9,6 +9,7 @@ export const rendererConfig: Configuration = {
 		rules,
 	},
 	plugins,
+	target: 'electron-renderer',
 	resolve: {
 		extensions: [".js", ".ts", ".jsx", ".tsx", ".css", ".scss"],
 		alias: {

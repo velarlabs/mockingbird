@@ -13,29 +13,8 @@ export type Endpoint = {
 };
 
 export default function Home() {
-  const [endpoints, setEndpoints] = useState<Endpoint[]>([
-    {
-      endpoint: "/api/users",
-      method: "GET",
-      mockResponse: [
-        { id: 1, username: "john_doe", email: "john@example.com" },
-        { id: 2, username: "jane_smith", email: "jane@example.com" },
-      ],
-      status: 200,
-      description: "Get a list of users",
-    },
-    {
-      endpoint: "/api/users",
-      method: "GET",
-      status: 200,
-      mockResponse: [
-        { id: 1, username: "john_doe", email: "john@example.com" },
-        { id: 2, username: "jane_smith", email: "jane@example.com" },
-      ],
-      description: "Get a list of users",
-    },
-  ]);
-  const [selectedEndpointIDX, setSelectedEndpointIDX] = useState(0);
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const [selectedEndpointIDX, setSelectedEndpointIDX] = useState(-1);
 
   return (
     <div className="h-screen overflow-hidden">

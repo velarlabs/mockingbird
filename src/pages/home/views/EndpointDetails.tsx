@@ -23,6 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ipcRenderer } from "electron";
+import { notification } from "antd";
 
 const formSchema = z.object({
   method: z.enum(["GET", "POST", "PUT", "DELETE"], {
@@ -53,131 +55,153 @@ export default function EndpointDetails({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      method: endpoints[selectedEndpointIDX].method,
-      description: endpoints[selectedEndpointIDX].description,
-      endpoint: endpoints[selectedEndpointIDX].endpoint,
-      status: endpoints[selectedEndpointIDX].status,
-      mockResponse: JSON.stringify(endpoints[selectedEndpointIDX].mockResponse),
+      method: endpoints[selectedEndpointIDX]?.method || "GET",
+      description: endpoints[selectedEndpointIDX]?.description || "",
+      endpoint: endpoints[selectedEndpointIDX]?.endpoint || "",
+      status: endpoints[selectedEndpointIDX]?.status || 200,
+      mockResponse:
+        JSON.stringify(endpoints[selectedEndpointIDX]?.mockResponse) || "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Invoke create endpoint with submitted data
+    await ipcRenderer.invoke("create-endpoint", {
+      prevEndpoint: endpoints[selectedEndpointIDX]?.endpoint,
+      endpoint: values.endpoint,
+      method: values.method,
+      mockResponse: values.mockResponse,
+      status: values.status,
+    });
+
+    // Update state
     setEndpoints((prevEndpoints) => {
       const newEndpoints = [...prevEndpoints];
       //@ts-ignore
-      newEndpoints[selectedEndpointIDX] = values;
+      newEndpoints[selectedEndpointIDX] = { ...values };
       return newEndpoints;
     });
-    console.log(values);
+
+    notification.success({
+      message: `Successfully created a ${values.method} endpoint`,
+      description: `${values.endpoint} with status ${values.status} created successfully.`,
+      placement: "top",
+    });
   }
 
   return (
     <div className="flex flex-col flex-1 gap-3 p-4">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col flex-1 w-full h-full space-y-4"
-        >
-          <div className="flex self-end justify-end gap-x-4">
-            <Button type="button" onClick={() => console.log("Run")}>
-              <Play className="w-4 h-4 mr-2" />
-              Run
-            </Button>
-            <Button type="submit">
-              <Save className="w-4 h-4 mr-2" />
-              Save
-            </Button>
-          </div>
-          <div className="flex justify-between w-full gap-x-4">
-            <FormField
-              control={form.control}
-              name="endpoint"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Endpoint</FormLabel>
-                  <FormControl>
-                    <Input
-                      name="endpoint"
-                      type="text"
-                      placeholder="Endpoint"
-                      {...field}
-                      className="w-full mb-4"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-sm text-red-500" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="method"
-              render={({ field }) => (
-                <FormItem className="w-40">
-                  <FormLabel>Method</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+      {selectedEndpointIDX == -1 ? (
+        <div className="flex items-center justify-center h-full">
+          No endpoint is selected.
+        </div>
+      ) : (
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col flex-1 w-full h-full space-y-4"
+          >
+            <div className="flex self-end justify-end gap-x-4">
+              <Button type="button" onClick={() => console.log("Run")}>
+                <Play className="w-4 h-4 mr-2" />
+                Run
+              </Button>
+              <Button type="submit">
+                <Save className="w-4 h-4 mr-2" />
+                Save
+              </Button>
+            </div>
+            <div className="flex justify-between w-full gap-x-4">
+              <FormField
+                control={form.control}
+                name="endpoint"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Endpoint</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a method." />
-                      </SelectTrigger>
+                      <Input
+                        name="endpoint"
+                        type="text"
+                        placeholder="Endpoint"
+                        {...field}
+                        className="w-full mb-4"
+                      />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="GET">GET</SelectItem>
-                      <SelectItem value="POST">POST</SelectItem>
-                      <SelectItem value="PUT">PUT</SelectItem>
-                      <SelectItem value="DELETE">DELETE</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage className="text-sm text-red-500" />
-                </FormItem>
-              )}
-            />
+                    <FormMessage className="text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="method"
+                render={({ field }) => (
+                  <FormItem className="w-40">
+                    <FormLabel>Method</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a method." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="GET">GET</SelectItem>
+                        <SelectItem value="POST">POST</SelectItem>
+                        <SelectItem value="PUT">PUT</SelectItem>
+                        <SelectItem value="DELETE">DELETE</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="w-40">
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <Input
+                        name="status"
+                        type="number"
+                        placeholder="Status"
+                        {...field}
+                        className="w-full mb-4"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-sm text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
-              name="status"
+              name="mockResponse"
               render={({ field }) => (
-                <FormItem className="w-40">
-                  <FormLabel>Status</FormLabel>
+                <FormItem className="flex flex-col flex-1 w-full h-full">
+                  <FormLabel>
+                    <Label htmlFor="mockResponse" className="mb-2">
+                      Mock response
+                    </Label>
+                  </FormLabel>
                   <FormControl>
-                    <Input
-                      name="status"
-                      type="number"
-                      placeholder="Status"
+                    <Textarea
+                      name="mockResponse"
+                      placeholder="Mock response"
                       {...field}
-                      className="w-full mb-4"
+                      className="flex-1"
                     />
                   </FormControl>
                   <FormMessage className="text-sm text-red-500" />
                 </FormItem>
               )}
             />
-          </div>
-          <FormField
-            control={form.control}
-            name="mockResponse"
-            render={({ field }) => (
-              <FormItem className="flex flex-col flex-1 w-full h-full">
-                <FormLabel>
-                  <Label htmlFor="mockResponse" className="mb-2">
-                    Mock response
-                  </Label>
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    name="mockResponse"
-                    placeholder="Mock response"
-                    {...field}
-                    className="flex-1"
-                  />
-                </FormControl>
-                <FormMessage className="text-sm text-red-500" />
-              </FormItem>
-            )}
-          />
-        </form>
-      </Form>
+          </form>
+        </Form>
+      )}
     </div>
   );
 }

@@ -7,6 +7,7 @@ export const mainConfig: Configuration = {
 	module: {
 		rules,
 	},
+	target: 'electron-main',
 	resolve: {
 		extensions: [".js", ".ts", ".jsx", ".tsx", ".css", ".json"],
 	},
