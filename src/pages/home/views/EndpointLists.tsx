@@ -1,6 +1,6 @@
-import { Button } from "../../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Endpoint } from "..";
-import { cn } from "../../../utils/cn";
+import { cn } from "@/utils/cn";
 import { Plus } from "lucide-react";
 
 interface Props {
@@ -42,7 +42,7 @@ export default function EndpointLists({
         Add New
       </Button>
       <div className="flex flex-col gap-2">
-        {endpoints.map(({ endpoint, method, status }, idx) => (
+{endpoints.map(({ endpoint, method }, idx) => (
           <div
             key={idx}
             className={cn(

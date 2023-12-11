@@ -12,7 +12,7 @@ export const rendererConfig: Configuration = {
 	resolve: {
 		extensions: [".js", ".ts", ".jsx", ".tsx", ".css", ".scss"],
 		alias: {
-			"@components": path.resolve("./src/components"),
+			"@": path.resolve(__dirname, "./src"),
 		},
 	},
 };
