@@ -1,4 +1,5 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
+import { addRoute } from "./server";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -10,6 +11,8 @@ if (require("electron-squirrel-startup")) {
 const createWindow = (): void => {
 	const mainWindow = new BrowserWindow({
 		webPreferences: {
+			nodeIntegration: true,
+			contextIsolation: false,
 			preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
 		},
 	});
@@ -21,7 +24,18 @@ const createWindow = (): void => {
 
 app.on("ready", () => {
 	createWindow();
-	require("./server.ts");
+
+	// Listening to create endpoint & calling addRoute
+	ipcMain.handle('create-endpoint', async (event, arg) => {
+		addRoute({
+			prevEndpoint: arg.prevEndpoint || "",
+			endpoint: arg.endpoint,
+			method: arg.method,
+			mockResponse: arg.mockResponse,
+			status: arg.status
+		})
+		return { msg: "Successfully created an endpoint: " + arg.endpoint };
+	})
 });
 
 app.on("window-all-closed", () => {
