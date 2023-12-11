@@ -1,8 +1,6 @@
-import * as ReactDOM from "react-dom";
 import Home from "./pages/home";
+import { createRoot } from "react-dom/client";
 
-function render() {
-	ReactDOM.render(<Home />, document.body);
-}
-
-render();
+const container = document.getElementById("app");
+const root = createRoot(container!);
+root.render(<Home />);
