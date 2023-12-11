@@ -199,7 +199,7 @@ export default function EndpointDetails({
                 </FormItem>
               )}
             />
-          </form>
+</form>
         </Form>
       )}
     </div>
