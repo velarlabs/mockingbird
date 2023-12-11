@@ -12,21 +12,22 @@ export const addRoute = ({
 	endpoint,
 	method,
 	mockResponse,
-	status
-}: { prevEndpoint?: string, endpoint: string, method: string, mockResponse: any, status: number }) => {
-
-	// Route Body ( mock response )
+	status,
+}: {
+	prevEndpoint?: string;
+	endpoint: string;
+	method: string;
+	mockResponse: any;
+	status: number;
+}) => {
 	const routeBody = (req: any, res: any) => {
-		const data = mockResponse;
-		res.status(status).json({
-			data
-		});
-	}
+		res.status(status).json(JSON.parse(mockResponse));
+	};
 
-	// Since can't delete a route, we need to filter it out
-	router.stack = router.stack.filter(i => i.route.path !== endpoint && i.route.path !== prevEndpoint);
+	router.stack = router.stack.filter(
+		(i) => i.route.path !== endpoint && i.route.path !== prevEndpoint
+	);
 
-	// Different methods
 	switch (method) {
 		case "GET":
 			router.get(endpoint, routeBody);
@@ -43,16 +44,14 @@ export const addRoute = ({
 		default:
 			break;
 	}
-
-}
+};
 
 app.use((req, res, next) => {
-	router(req, res, next)
-})
+	router(req, res, next);
+});
 
 const port = 3005;
 
 app.listen(port, () => {
 	console.log(`Server running on port ${port}`);
 });
-1
