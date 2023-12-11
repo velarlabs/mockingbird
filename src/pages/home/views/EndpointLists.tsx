@@ -42,7 +42,7 @@ export default function EndpointLists({
         Add New
       </Button>
       <div className="flex flex-col gap-2">
-        {endpoints.map(({ endpoint, method }, idx) => (
+{endpoints.map(({ endpoint, method }, idx) => (
           <div
             key={idx}
             className={cn(

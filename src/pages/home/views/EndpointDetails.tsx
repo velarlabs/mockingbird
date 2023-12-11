@@ -79,7 +79,7 @@ export default function EndpointDetails({
           className="flex flex-col flex-1 w-full h-full space-y-4"
         >
           <div className="flex self-end justify-end gap-x-4">
-            <Button type="button" onClick={() => console.log("Run")}>
+<Button type="button" onClick={() => console.log("Run")}>
               <Play className="w-4 h-4 mr-2" />
               Run
             </Button>
