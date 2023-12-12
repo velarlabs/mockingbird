@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { langs } from "@uiw/codemirror-extensions-langs";
 import CodeMirror, { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { Button } from "antd";
+import { Button } from "./ui/button";
 
 type Props = {
   json?: string;
@@ -65,7 +65,7 @@ const JsonEditor = ({ json, setJson }: Props) => {
         backgroundColor: "rgb(245, 245, 245)",
       }}
     >
-      <div className="flex items-center justify-between py-1 pl-3 text-xs">
+      <div className="flex items-center justify-between px-3 py-2 text-xs">
         <div>{linebar && <span> {linebar} </span>}</div>
         {message && (
           <div className="p-1 px-2 ml-3 text-white bg-red-600 rounded-sm">
@@ -74,7 +74,12 @@ const JsonEditor = ({ json, setJson }: Props) => {
         )}
         {!message && (
           <div>
-            <Button size="small" onClick={formatJson}>
+            <Button
+              variant="outline"
+              type="button"
+              size="sm"
+              onClick={formatJson}
+            >
               Format
             </Button>
           </div>

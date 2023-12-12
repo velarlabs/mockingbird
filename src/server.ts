@@ -46,6 +46,17 @@ export const addRoute = ({
 	}
 };
 
+export const deleteRoute = ({
+	endpoint
+}: {
+	endpoint: string;
+}) => {
+	router.stack = router.stack.filter(
+		(i) => i.route.path !== endpoint
+	);
+
+};
+
 app.use((req, res, next) => {
 	router(req, res, next);
 });

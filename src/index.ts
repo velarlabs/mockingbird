@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
-import { addRoute } from "./server";
+import { addRoute, deleteRoute } from "./server";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -35,6 +35,14 @@ app.on("ready", () => {
 			status: arg.status
 		})
 		return { msg: "Successfully created an endpoint: " + arg.endpoint };
+	})
+
+	// Listening to delete endpoint & calling deleteRoute
+	ipcMain.handle('delete-endpoint', async (event, arg) => {
+		deleteRoute({
+			endpoint: arg.endpoint
+		})
+		return { msg: "Successfully deleted an endpoint: " + arg.endpoint };
 	})
 });
 
