@@ -21,7 +21,7 @@ export const addRoute = ({
 	status: number;
 }) => {
 	const routeBody = (req: any, res: any) => {
-		res.status(status).json(JSON.parse(mockResponse));
+		res.status(status).json(mockResponse);
 	};
 
 	router.stack = router.stack.filter(
