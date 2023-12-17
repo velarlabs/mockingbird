@@ -22,9 +22,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ipcRenderer } from "electron";
 import { notification } from "antd";
+import JsonEditor from "@/components/JsonEditor";
 
 const formSchema = z.object({
   method: z.enum(["GET", "POST", "PUT", "DELETE"], {
@@ -59,10 +59,11 @@ export default function EndpointDetails({
       description: endpoints[selectedEndpointIDX]?.description || "",
       endpoint: endpoints[selectedEndpointIDX]?.endpoint || "",
       status: endpoints[selectedEndpointIDX]?.status || 200,
-      mockResponse:
-        JSON.stringify(endpoints[selectedEndpointIDX]?.mockResponse) || "",
+      mockResponse: endpoints[selectedEndpointIDX]?.mockResponse || {},
     },
   });
+
+  const mockResponseWatch = form.watch("mockResponse");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Invoke create endpoint with submitted data
@@ -102,11 +103,24 @@ export default function EndpointDetails({
             className="flex flex-col flex-1 w-full h-full space-y-4"
           >
             <div className="flex self-end justify-end gap-x-4">
-              <Button type="button" onClick={() => console.log("Run")}>
+              <Button
+                type="button"
+                onClick={() => console.log("Run")}
+                disabled={!mockResponseWatch}
+                className={
+                  !mockResponseWatch ? "opacity-40 cursor-not-allowed" : ""
+                }
+              >
                 <Play className="w-4 h-4 mr-2" />
                 Run
               </Button>
-              <Button type="submit">
+              <Button
+                disabled={!mockResponseWatch}
+                type="submit"
+                className={
+                  !mockResponseWatch ? "opacity-40 cursor-not-allowed" : ""
+                }
+              >
                 <Save className="w-4 h-4 mr-2" />
                 Save
               </Button>
@@ -188,18 +202,13 @@ export default function EndpointDetails({
                     </Label>
                   </FormLabel>
                   <FormControl>
-                    <Textarea
-                      name="mockResponse"
-                      placeholder="Mock response"
-                      {...field}
-                      className="flex-1"
-                    />
+                    <JsonEditor json={field.value} setJson={field.onChange} />
                   </FormControl>
                   <FormMessage className="text-sm text-red-500" />
                 </FormItem>
               )}
             />
-</form>
+          </form>
         </Form>
       )}
     </div>
