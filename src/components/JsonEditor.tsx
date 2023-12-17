@@ -51,21 +51,33 @@ const JsonEditor = ({ json, setJson }: Props) => {
     [code]
   );
 
+  const codeMirrorOnUpdate = (cm: any) => {
+    const { selection } = cm.state;
+    const line = cm.view.state.doc.lineAt(selection.main.from);
+    setLinebar(
+      `Line ${line.number}/${cm.state.doc.lines}, Column ${
+        cm.state.selection.main.head - line.from + 1
+      }`
+    );
+    const text = cm.state.sliceDoc(selection.main.from, selection.main.to);
+    if (text) {
+      if (selection.ranges.length > 1) {
+        setLinebar(`${selection.ranges.length} selection regions`);
+      } else {
+        setLinebar(
+          `${text.split("\n").length} lines, ${text.length} characters selected`
+        );
+      }
+    }
+  };
+
   useEffect(() => {
     handleJson();
   }, [code, handleJson]);
 
   return (
-    <div
-      style={{
-        minWidth: 230,
-        width: "100%",
-        height: "100%",
-        position: "relative",
-        backgroundColor: "rgb(245, 245, 245)",
-      }}
-    >
-      <div className="flex items-center justify-between px-3 py-2 text-xs">
+    <div className="w-full min-w-[230px] h-full relative bg-[rgb(245, 245, 245)]">
+      <div className="flex items-center justify-between py-1 pl-3 text-xs">
         <div>{linebar && <span> {linebar} </span>}</div>
         {message && (
           <div className="p-1 px-2 ml-3 text-white bg-red-600 rounded-sm">
@@ -85,42 +97,15 @@ const JsonEditor = ({ json, setJson }: Props) => {
           </div>
         )}
       </div>
-      <div
-        style={{ overflow: "auto", height: "100%", boxSizing: "border-box" }}
-      >
+      <div className="box-border h-full overflow-auto">
         <CodeMirror
           value={code}
           ref={cmRef}
           height="100%"
-          style={{ height: "100%" }}
+          className="h-full"
           extensions={[langs.json()]}
-          onUpdate={(cm) => {
-            const { selection } = cm.state;
-            const line = cm.view.state.doc.lineAt(selection.main.from);
-            setLinebar(
-              `Line ${line.number}/${cm.state.doc.lines}, Column ${
-                cm.state.selection.main.head - line.from + 1
-              }`
-            );
-            const text = cm.state.sliceDoc(
-              selection.main.from,
-              selection.main.to
-            );
-            if (text) {
-              if (selection.ranges.length > 1) {
-                setLinebar(`${selection.ranges.length} selection regions`);
-              } else {
-                setLinebar(
-                  `${text.split("\n").length} lines, ${
-                    text.length
-                  } characters selected`
-                );
-              }
-            }
-          }}
-          onChange={(value) => {
-            setCode(value);
-          }}
+          onUpdate={(cm) => codeMirrorOnUpdate(cm)}
+          onChange={setCode}
         />
       </div>
     </div>
