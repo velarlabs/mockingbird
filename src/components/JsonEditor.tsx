@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { langs } from "@uiw/codemirror-extensions-langs";
 import CodeMirror, { ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { Button } from "antd";
+import { Button } from "./ui/button";
 
 type Props = {
   json?: string;
@@ -86,7 +86,12 @@ const JsonEditor = ({ json, setJson }: Props) => {
         )}
         {!message && (
           <div>
-            <Button size="small" onClick={formatJson}>
+            <Button
+              variant="outline"
+              type="button"
+              size="sm"
+              onClick={formatJson}
+            >
               Format
             </Button>
           </div>

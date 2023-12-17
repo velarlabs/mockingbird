@@ -13,7 +13,7 @@ export type Endpoint = {
 };
 
 export default function Home() {
-const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
+  const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [selectedEndpointIDX, setSelectedEndpointIDX] = useState(-1);
 
   return (
@@ -32,6 +32,7 @@ const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
           <EndpointDetails
             key={selectedEndpointIDX}
             selectedEndpointIDX={selectedEndpointIDX}
+            setSelectedEndpointIDX={setSelectedEndpointIDX}
             endpoints={endpoints}
             setEndpoints={setEndpoints}
           />

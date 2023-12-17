@@ -3,7 +3,7 @@ import { Endpoint } from "..";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Play, Save } from "lucide-react";
+import { Save, Trash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -23,8 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ipcRenderer } from "electron";
-import { notification } from "antd";
 import JsonEditor from "@/components/JsonEditor";
+import { Modal, notification } from "antd";
 
 const formSchema = z.object({
   method: z.enum(["GET", "POST", "PUT", "DELETE"], {
@@ -43,6 +43,7 @@ const formSchema = z.object({
 
 interface Props {
   selectedEndpointIDX: number;
+  setSelectedEndpointIDX: React.Dispatch<React.SetStateAction<number>>;
   endpoints: Endpoint[];
   setEndpoints: React.Dispatch<React.SetStateAction<Endpoint[]>>;
 }
@@ -51,6 +52,7 @@ export default function EndpointDetails({
   endpoints,
   setEndpoints,
   selectedEndpointIDX,
+  setSelectedEndpointIDX,
 }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,26 +67,45 @@ export default function EndpointDetails({
 
   const mockResponseWatch = form.watch("mockResponse");
 
-  async function runAPI() {
+  // async function runAPI() {
+  //   // Invoke create endpoint with submitted data
+  //   await ipcRenderer.invoke("create-endpoint", {
+  //     prevEndpoint: endpoints[selectedEndpointIDX]?.endpoint,
+  //     endpoint: form.getValues("endpoint"),
+  //     method: form.getValues("method"),
+  //     mockResponse: form.getValues("mockResponse"),
+  //     status: form.getValues("status"),
+  //   });
+
+  //   notification.success({
+  //     message: `API successfully ran as ${form.getValues("method")}`,
+  //     description: `${form.getValues("endpoint")} with status ${form.getValues(
+  //       "status"
+  //     )} ran successfully.`,
+  //     placement: "top",
+  //   });
+  // }
+
+  const deleteAPI = async () => {
     // Invoke create endpoint with submitted data
-    await ipcRenderer.invoke("create-endpoint", {
-      prevEndpoint: endpoints[selectedEndpointIDX]?.endpoint,
-      endpoint: form.getValues("endpoint"),
-      method: form.getValues("method"),
-      mockResponse: form.getValues("mockResponse"),
-      status: form.getValues("status"),
+    await ipcRenderer.invoke("delete-endpoint", {
+      endpoint: endpoints[selectedEndpointIDX]?.endpoint,
     });
+
+    setEndpoints((prevEndpoints) => {
+      const newEndpoints = [...prevEndpoints];
+      newEndpoints.splice(selectedEndpointIDX, 1);
+      return newEndpoints;
+    });
+    setSelectedEndpointIDX(-1);
 
     notification.success({
-      message: `API successfully ran as ${form.getValues("method")}`,
-      description: `${form.getValues("endpoint")} with status ${form.getValues(
-        "status"
-      )} ran successfully.`,
+      message: `Successfully deleted endpoint`,
       placement: "top",
     });
-  }
+  };
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Update state
     setEndpoints((prevEndpoints) => {
       const newEndpoints = [...prevEndpoints];
@@ -93,9 +114,18 @@ export default function EndpointDetails({
       return newEndpoints;
     });
 
+    // Invoke create endpoint with submitted data
+    await ipcRenderer.invoke("create-endpoint", {
+      prevEndpoint: endpoints[selectedEndpointIDX]?.endpoint,
+      endpoint: values.endpoint,
+      method: values.method,
+      mockResponse: values.mockResponse,
+      status: values.status,
+    });
+
     notification.success({
-      message: `Successfully saved ${values.method} endpoint`,
-      description: `${values.endpoint} with status ${values.status} created successfully.`,
+      message: `Successfully saved ${values.method} & ran endpoint`,
+      description: `${values.endpoint} with status ${values.status} saved successfully.`,
       placement: "top",
     });
   }
@@ -113,7 +143,7 @@ export default function EndpointDetails({
             className="flex flex-col flex-1 w-full h-full space-y-4"
           >
             <div className="flex self-end justify-end gap-x-4">
-              <Button
+              {/* <Button
                 type="button"
                 onClick={runAPI}
                 disabled={!mockResponseWatch}
@@ -123,7 +153,7 @@ export default function EndpointDetails({
               >
                 <Play className="w-4 h-4 mr-2" />
                 Run
-              </Button>
+              </Button> */}
               <Button
                 disabled={!mockResponseWatch}
                 type="submit"
@@ -132,7 +162,22 @@ export default function EndpointDetails({
                 }
               >
                 <Save className="w-4 h-4 mr-2" />
-                Save
+                Save & Run
+              </Button>
+              <Button
+                type="button"
+                onClick={async () => {
+                  Modal.confirm({
+                    title: "Delete Endpoint",
+                    content: "Are you sure you want to delete this endpoint?",
+                    async onOk() {
+                      await deleteAPI();
+                    },
+                  });
+                }}
+              >
+                <Trash className="w-4 h-4 mr-2" />
+                Delete
               </Button>
             </div>
             <div className="flex justify-between w-full gap-x-4">

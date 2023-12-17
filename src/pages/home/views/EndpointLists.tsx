@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Endpoint } from "..";
-import { cn } from "@/utils/cn";
+import { cn } from "@/utils";
 import { Plus } from "lucide-react";
 
 interface Props {
