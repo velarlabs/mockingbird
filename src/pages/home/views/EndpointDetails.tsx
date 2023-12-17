@@ -65,16 +65,26 @@ export default function EndpointDetails({
 
   const mockResponseWatch = form.watch("mockResponse");
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function runAPI() {
     // Invoke create endpoint with submitted data
     await ipcRenderer.invoke("create-endpoint", {
       prevEndpoint: endpoints[selectedEndpointIDX]?.endpoint,
-      endpoint: values.endpoint,
-      method: values.method,
-      mockResponse: values.mockResponse,
-      status: values.status,
+      endpoint: form.getValues("endpoint"),
+      method: form.getValues("method"),
+      mockResponse: form.getValues("mockResponse"),
+      status: form.getValues("status"),
     });
 
+    notification.success({
+      message: `API successfully ran as ${form.getValues("method")}`,
+      description: `${form.getValues("endpoint")} with status ${form.getValues(
+        "status"
+      )} ran successfully.`,
+      placement: "top",
+    });
+  }
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
     // Update state
     setEndpoints((prevEndpoints) => {
       const newEndpoints = [...prevEndpoints];
@@ -84,7 +94,7 @@ export default function EndpointDetails({
     });
 
     notification.success({
-      message: `Successfully created a ${values.method} endpoint`,
+      message: `Successfully saved ${values.method} endpoint`,
       description: `${values.endpoint} with status ${values.status} created successfully.`,
       placement: "top",
     });
@@ -105,7 +115,7 @@ export default function EndpointDetails({
             <div className="flex self-end justify-end gap-x-4">
               <Button
                 type="button"
-                onClick={() => console.log("Run")}
+                onClick={runAPI}
                 disabled={!mockResponseWatch}
                 className={
                   !mockResponseWatch ? "opacity-40 cursor-not-allowed" : ""
