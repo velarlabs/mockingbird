@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
-import { addRoute, deleteRoute } from "./server";
+import { addAndSaveRoute, deleteRoute } from "./server";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -25,15 +25,14 @@ const createWindow = (): void => {
 app.on("ready", () => {
 	createWindow();
 
-	// Listening to create endpoint & calling addRoute
-	ipcMain.handle('create-endpoint', async (event, arg) => {
-		addRoute({
+	ipcMain.handle("create-endpoint", async (event, arg) => {
+		addAndSaveRoute({
 			prevEndpoint: arg.prevEndpoint || "",
 			endpoint: arg.endpoint,
 			method: arg.method,
 			mockResponse: arg.mockResponse,
-			status: arg.status
-		})
+			status: arg.status,
+		});
 		return { msg: "Successfully created an endpoint: " + arg.endpoint };
 	})
 
@@ -44,6 +43,11 @@ app.on("ready", () => {
 		})
 		return { msg: "Successfully deleted an endpoint: " + arg.endpoint };
 	})
+	});
+
+	ipcMain.handle("response-endpoints", async (event, arg) => {
+		return store.get("routes") ?? [];
+	});
 });
 
 app.on("window-all-closed", () => {

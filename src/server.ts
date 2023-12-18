@@ -1,11 +1,28 @@
 import express from "express";
 import cors from "cors";
+import Store from "electron-store";
 
 const app = express();
 
 app.use(cors());
 
+export const store = new Store();
+
 const router = express.Router();
+
+type AddRouteArgs = {
+	prevEndpoint?: string;
+	endpoint: string;
+	method: string;
+	mockResponse: any;
+	status: number;
+};
+
+export const addAndSaveRoute = (config: AddRouteArgs) => {
+	addRoute(config);
+	const existingRoutes: any = store.get("routes") ?? [];
+	store.set("routes", [...existingRoutes, config]);
+};
 
 export const addRoute = ({
 	prevEndpoint,
@@ -13,13 +30,7 @@ export const addRoute = ({
 	method,
 	mockResponse,
 	status,
-}: {
-	prevEndpoint?: string;
-	endpoint: string;
-	method: string;
-	mockResponse: any;
-	status: number;
-}) => {
+}: AddRouteArgs) => {
 	const routeBody = (req: any, res: any) => {
 		res.status(status).json(mockResponse);
 	};
@@ -41,11 +52,10 @@ export const addRoute = ({
 		case "DELETE":
 			router.delete(endpoint, routeBody);
 			break;
-		default:
-			break;
 	}
 };
 
+<<<<<<< Updated upstream
 export const deleteRoute = ({
 	endpoint
 }: {
@@ -60,6 +70,15 @@ export const deleteRoute = ({
 app.use((req, res, next) => {
 	router(req, res, next);
 });
+=======
+const initializeRoutes = () => {
+	const existingRoutes: any = store.get("routes") ?? [];
+	existingRoutes.forEach((route: AddRouteArgs) => addRoute(route));
+};
+
+initializeRoutes();
+app.use(router);
+>>>>>>> Stashed changes
 
 const port = 3005;
 
